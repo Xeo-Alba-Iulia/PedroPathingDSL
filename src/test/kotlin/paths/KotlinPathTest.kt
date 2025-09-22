@@ -2,8 +2,8 @@ package com.pedropathing.paths
 
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.Pose
-import org.junit.jupiter.api.Assertions.assertThrows
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertIsNot
 
@@ -16,7 +16,7 @@ class KotlinPathTest {
     @Test
     fun `Empty pose list throws exception`() {
         val path = KotlinPath(PathConstraints.defaultConstraints, ::BezierCurve)
-        assertThrows(IllegalStateException::class.java, path::build)
+        assertFailsWith(IllegalStateException::class, path::build)
     }
 
     @Test
