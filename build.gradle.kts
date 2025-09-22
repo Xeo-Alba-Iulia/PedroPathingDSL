@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.pedropathing:core:1.1.0-SNAPSHOT")
+    api("com.pedropathing:core:1.1.0-SNAPSHOT")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("reflect"))
     testImplementation("com.pedropathing:core:1.1.0-SNAPSHOT")
