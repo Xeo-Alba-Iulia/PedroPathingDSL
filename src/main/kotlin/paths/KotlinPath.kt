@@ -12,16 +12,12 @@ class KotlinPath internal constructor(
 ) {
     private val pathPoints = mutableListOf<Pose>()
 
-    operator fun Pose.unaryPlus() {
-        pathPoints += this
-    }
+    operator fun Pose.unaryPlus() { pathPoints += this }
 
-    internal fun build() = Path(
-        when (pathPoints.size) {
-            0 -> throw IllegalStateException("A path must have at least one point")
-            1 -> BezierPoint(pathPoints.first())
-            2 -> BezierLine(pathPoints.first(), pathPoints.last())
-            else -> curveFactory(pathPoints, pathConstraints)
-        }
-    )
+    internal fun build() = Path(when (pathPoints.size) {
+        0 -> throw IllegalStateException("A path must have at least one point")
+        1 -> BezierPoint(pathPoints.first())
+        2 -> BezierLine(pathPoints.first(), pathPoints.last())
+        else -> curveFactory(pathPoints, pathConstraints)
+    })
 }

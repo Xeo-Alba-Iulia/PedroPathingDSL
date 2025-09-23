@@ -19,7 +19,6 @@ class KotlinPathBuilder internal constructor(
     ) {
         val path = KotlinPath(pathConstraints, curveFactory)
         path.init()
-
         pathChain += path.build().apply { setHeadingInterpolation(interpolator)  }
     }
 
@@ -56,9 +55,7 @@ class KotlinPathBuilder internal constructor(
 
     internal fun build(): PathChain {
         val pathChain = PathChain(pathChain)
-        if (globalHeadingInterpolator != null) {
-            pathChain.setHeadingInterpolator(globalHeadingInterpolator)
-        }
+        globalHeadingInterpolator?.let { pathChain.setHeadingInterpolator(it) }
         return pathChain
     }
 }
