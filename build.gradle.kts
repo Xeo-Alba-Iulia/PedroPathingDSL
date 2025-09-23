@@ -13,9 +13,8 @@ repositories {
 
 dependencies {
     api("com.pedropathing:core:1.1.0-SNAPSHOT")
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
     testImplementation(kotlin("reflect"))
-    testImplementation("com.pedropathing:core:1.1.0-SNAPSHOT")
 }
 
 publishing {
@@ -29,9 +28,6 @@ publishing {
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
 kotlin {
     jvmToolchain(8)
 }

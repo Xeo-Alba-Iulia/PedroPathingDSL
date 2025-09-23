@@ -10,18 +10,17 @@ import kotlin.test.assertIsNot
 class KotlinPathTest {
     private class CustomTestCurve(
         points: List<Pose>,
-        constraints: PathConstraints
-    ) : BezierCurve(points, constraints)
+    ) : BezierCurve(points)
 
     @Test
     fun `Empty pose list throws exception`() {
-        val path = KotlinPath(PathConstraints.defaultConstraints, ::BezierCurve)
+        val path = KotlinPath(::BezierCurve)
         assertFailsWith(IllegalStateException::class, path::build)
     }
 
     @Test
     fun `Custom curve factory is used`() {
-        val testPathChain = pathChain {
+        val testPathChain = pathChain(follower = null) {
             path {
                 +Pose(0.0, 0.0, 0.0)
                 +Pose(1.0, 1.0, 0.0)

@@ -6,11 +6,11 @@ import com.pedropathing.geometry.Curve
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.callbacks.PathCallback
 
-internal typealias CallbackFactory = (Int, Follower, Curve) -> PathCallback
+internal typealias CallbackFactory = (Int, Follower?, Curve) -> PathCallback
 
 @PathMarker
 class KotlinPathBuilder internal constructor(
-    private val follower: Follower,
+    private val follower: Follower?,
     private val pathConstraints: PathConstraints,
     private val globalHeadingInterpolator: HeadingInterpolator?
 ) {
@@ -26,7 +26,9 @@ class KotlinPathBuilder internal constructor(
         val path = KotlinPath(curveFactory)
         path.init()
         val (builtPath, pathCallbackFactories) = path.build()
-        callbacks += pathCallbackFactories.map { it(pathChain.size, follower, builtPath.curve) }
+        callbacks += pathCallbackFactories.map {
+            it(pathChain.size, follower, builtPath.curve)
+        }
         pathChain += builtPath.apply {
             setHeadingInterpolation(interpolator)
             setConstraints(pathConstraints)
@@ -72,7 +74,7 @@ class KotlinPathBuilder internal constructor(
 }
 
 fun pathChain(
-    follower: Follower,
+    follower: Follower?,
     pathConstraints: PathConstraints = PathConstraints.defaultConstraints,
     globalHeadingInterpolator: HeadingInterpolator? = null,
     init: KotlinPathBuilder.() -> Unit,
