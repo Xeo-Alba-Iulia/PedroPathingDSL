@@ -20,10 +20,13 @@ class KotlinPath internal constructor(
         callbacks += callbackBuilder.build()
     }
 
-    internal fun build() = Pair(Path(when (pathPoints.size) {
-        0 -> throw IllegalStateException("A path must have at least one point")
-        1 -> BezierPoint(pathPoints.first())
-        2 -> BezierLine(pathPoints.first(), pathPoints.last())
-        else -> curveFactory(pathPoints)
-    }), callbacks)
+    internal fun build() = Pair(
+        Path(
+            when (pathPoints.size) {
+                0 -> throw IllegalStateException("A path must have at least one point")
+                1 -> BezierPoint(pathPoints.first())
+                2 -> BezierLine(pathPoints.first(), pathPoints.last())
+                else -> curveFactory(pathPoints)
+            }
+        ), callbacks)
 }
