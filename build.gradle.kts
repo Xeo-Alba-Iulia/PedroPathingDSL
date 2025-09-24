@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pedropathing"
-version = "1.1.0-SNAPSHOT-0.2.0"
+version = "1.1.0-SNAPSHOT-0.2.1"
 
 repositories {
     mavenCentral()
