@@ -26,13 +26,8 @@ class KotlinPathBuilder internal constructor(
         val path = KotlinPath(curveFactory)
         path.init()
         val (builtPath, pathCallbackFactories) = path.build()
-        callbacks += pathCallbackFactories.map {
-            it(pathChain.size, follower, builtPath.curve)
-        }
-        pathChain += builtPath.apply {
-            setHeadingInterpolation(interpolator)
-            setConstraints(pathConstraints)
-        }
+        callbacks += pathCallbackFactories.map { it(pathChain.size, follower, builtPath.curve) }
+        pathChain += builtPath.apply { setHeadingInterpolation(interpolator); setConstraints(pathConstraints) }
     }
 
     fun pathConstantHeading(
