@@ -11,6 +11,7 @@ internal typealias CallbackFactory = (Int, Follower?, Curve) -> PathCallback
 @PathMarker
 class KotlinPathBuilder internal constructor(
     private val follower: Follower?,
+    private val decelerationType: PathChain.DecelerationType,
     private val pathConstraints: PathConstraints,
     private val globalHeadingInterpolator: HeadingInterpolator?
 ) {
@@ -61,20 +62,21 @@ class KotlinPathBuilder internal constructor(
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.facingPoint(x, y), curveFactory, init)
 
-    internal fun build(): PathChain {
-        val pathChain = PathChain(pathChain)
-        globalHeadingInterpolator?.let { pathChain.setHeadingInterpolator(it) }
-        return pathChain
+    internal fun build() = PathChain(pathChain).apply {
+        globalHeadingInterpolator?.let { setHeadingInterpolator(it) }
+        decelerationType = this@KotlinPathBuilder.decelerationType
+        callbacks = this@KotlinPathBuilder.callbacks
     }
 }
 
 fun pathChain(
     follower: Follower?,
+    decelerationType: PathChain.DecelerationType = PathChain.DecelerationType.LAST_PATH,
     pathConstraints: PathConstraints = PathConstraints.defaultConstraints,
     globalHeadingInterpolator: HeadingInterpolator? = null,
     init: KotlinPathBuilder.() -> Unit,
 ): PathChain {
-    val builder = KotlinPathBuilder(follower, pathConstraints, globalHeadingInterpolator)
+    val builder = KotlinPathBuilder(follower, decelerationType, pathConstraints, globalHeadingInterpolator)
     builder.init()
     return builder.build()
 }
