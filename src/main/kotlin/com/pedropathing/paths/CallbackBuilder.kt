@@ -7,6 +7,7 @@ import com.pedropathing.paths.callbacks.PoseCallback
 import com.pedropathing.paths.callbacks.TemporalCallback
 import kotlin.time.Duration
 
+@PathMarker
 class CallbackBuilder internal constructor() {
     private var callbacks = mutableListOf<CallbackFactory>()
 
