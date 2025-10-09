@@ -17,6 +17,10 @@ dependencies {
     testImplementation(kotlin("reflect"))
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
