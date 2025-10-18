@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pedropathing"
-version = "0.2.2-2.0.2"
+version = "0.2.3"
 
 repositories {
     mavenCentral()
@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    api("com.pedropathing:core:2.0.2")
+    api("com.pedropathing:core:2.0.3")
     testImplementation(kotlin("test-junit5"))
     testImplementation(kotlin("reflect"))
 }
