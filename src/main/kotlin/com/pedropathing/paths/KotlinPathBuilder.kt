@@ -47,6 +47,25 @@ class KotlinPathBuilder internal constructor(
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.linear(startHeading, endHeading, endTime), curveFactory, init)
 
+    @PathLinearExperimental
+    fun pathLinearHeading(
+        endTime: Double = 1.0,
+        pathConstraints: PathConstraints = this.pathConstraints,
+        curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
+        init: KotlinPath.() -> Unit,
+    ) {
+        val path = KotlinPath(curveFactory)
+        path.init()
+        val (builtPath, pathCallbackFactories) = path.build()
+
+        val startHeading = builtPath.firstControlPoint.heading
+        val endHeading = builtPath.lastControlPoint.heading
+        val interpolator = HeadingInterpolator.linear(startHeading, endHeading, endTime)
+
+        callbacks += pathCallbackFactories.map { it(pathChain.size, follower, builtPath.curve) }
+        pathChain += builtPath.apply { setHeadingInterpolation(interpolator); setConstraints(pathConstraints) }
+    }
+
     fun pathFacingPoint(
         pose: Pose,
         pathConstraints: PathConstraints = this.pathConstraints,
