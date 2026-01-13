@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    api("com.pedropathing:core:2.0.3")
+    api("com.pedropathing:core:2.0.5")
     testImplementation(kotlin("test-junit5"))
     testImplementation(kotlin("reflect"))
 }
@@ -30,8 +30,4 @@ publishing {
             version = project.version.toString()
         }
     }
-}
-
-kotlin {
-    jvmToolchain(8)
 }
