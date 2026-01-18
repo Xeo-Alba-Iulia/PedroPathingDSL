@@ -2,6 +2,7 @@ package com.pedropathing.paths
 
 import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
+import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Curve
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.callbacks.PathCallback
@@ -18,6 +19,24 @@ class KotlinPathBuilder internal constructor(
     private val pathChain = ArrayList<Path>()
     private val callbacks = ArrayList<PathCallback>()
 
+    /**
+     * Creates a path and adds it to the path chain.
+     *
+     * Example usage:
+     * ```
+     * path {
+     *    +Pose(0.0, 0.0) // Add control points using unaryPlus.
+     *    +Pose(1.0, 1.0) // You can use the return value checker from kotlin 2.3.0
+     *    callbacks {...} // to ensure that the plus sign is not forgotten.
+     * }
+     * ```
+     * @param pathConstraints the constraints to apply to this path
+     * @param interpolator the heading interpolator to use for this path
+     * @param curveFactory This factory is used to allow custom Curves to be created. Only takes effect if the path has
+     * more than 2 control points.
+     *
+     * @param init the DSL block to build the path. Poses can be added using [KotlinPath.unaryPlus]
+     */
     fun path(
         pathConstraints: PathConstraints = this.pathConstraints,
         interpolator: HeadingInterpolator = HeadingInterpolator.tangent,
@@ -31,6 +50,14 @@ class KotlinPathBuilder internal constructor(
         pathChain += builtPath.apply { setHeadingInterpolation(interpolator); setConstraints(pathConstraints) }
     }
 
+    /**
+     * Shortcut for
+     * ```
+     * path(interpolator = HeadingInterpolator.constant(constantHeading))
+     * ```
+     *
+     * @see path
+     */
     fun pathConstantHeading(
         constantHeading: Double,
         pathConstraints: PathConstraints = this.pathConstraints,
@@ -38,6 +65,14 @@ class KotlinPathBuilder internal constructor(
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.constant(constantHeading), curveFactory, init)
 
+    /**
+     * Shortcut for
+     * ```
+     * path(interpolator = HeadingInterpolator.linear(startHeading, endHeading, endTime))
+     * ```
+     *
+     * @see path
+     */
     fun pathLinearHeading(
         startHeading: Double,
         endHeading: Double,
@@ -47,6 +82,9 @@ class KotlinPathBuilder internal constructor(
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.linear(startHeading, endHeading, endTime), curveFactory, init)
 
+    /**
+     * Creates a path with a linear heading interpolation between the headings of the first and last control points.
+     */
     @PathLinearExperimental
     fun pathLinearHeading(
         endTime: Double = 1.0,
@@ -66,6 +104,31 @@ class KotlinPathBuilder internal constructor(
         pathChain += builtPath.apply { setHeadingInterpolation(interpolator); setConstraints(pathConstraints) }
     }
 
+    /**
+     * Creates a path from the last control point of the previous path to the specified pose,
+     * with a linear heading interpolation between the headings of the start and end poses.
+     */
+    @PathLinearExperimental
+    fun pathToPose(
+        endTime: Double = 1.0,
+        pathConstraints: PathConstraints = this.pathConstraints,
+        pose: Pose,
+    ) {
+        val lastPose = pathChain.lastOrNull()?.lastControlPoint ?: error("No previous path to get starting pose from")
+        val path = Path(BezierLine(lastPose, pose), pathConstraints).apply {
+            setHeadingInterpolation(HeadingInterpolator.linear(lastPose.heading, pose.heading))
+        }
+        pathChain += path
+    }
+
+    /**
+     * Shortcut for
+     * ```
+     * path(interpolator = HeadingInterpolator.facingPoint(pose))
+     * ```
+     *
+     * @see path
+     */
     fun pathFacingPoint(
         pose: Pose,
         pathConstraints: PathConstraints = this.pathConstraints,
@@ -73,6 +136,14 @@ class KotlinPathBuilder internal constructor(
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.facingPoint(pose), curveFactory, init)
 
+    /**
+     * Shortcut for
+     * ```
+     * path(interpolator = HeadingInterpolator.facingPoint(x, y))
+     * ```
+     *
+     * @see path
+     */
     fun pathFacingPoint(
         x: Double,
         y: Double,
@@ -88,14 +159,36 @@ class KotlinPathBuilder internal constructor(
     }
 }
 
+/**
+ * Builds a PathChain using a Kotlin DSL.
+ *
+ * Example usage:
+ *
+ * ```
+ * val firstPath = pathChain(null) {
+ *    path {
+ *        +Pose(0.0, 0.0)
+ *        +Pose(1.0, 1.0)
+ *        +Pose(2.0, 0.0)
+ *        callbacks {
+ *            temporalCallback(500.milliseconds) {
+ *                println("Reached half a second on this path!")
+ *            }
+ *        }
+ *    }
+ * }
+ * ```
+ *
+ * @param follower The follower is used for [ParametricCallback][com.pedropathing.paths.callbacks.ParametricCallback]
+ * and [PoseCallback][com.pedropathing.paths.callbacks.PoseCallback]. It can be null if these callbacks are not used.
+ *
+ * @param init the DSL block to build the PathChain
+ * @return the built PathChain
+ */
 fun pathChain(
     follower: Follower?,
     decelerationType: PathChain.DecelerationType = PathChain.DecelerationType.LAST_PATH,
     pathConstraints: PathConstraints = PathConstraints.defaultConstraints,
     globalHeadingInterpolator: HeadingInterpolator? = null,
     init: KotlinPathBuilder.() -> Unit,
-): PathChain {
-    val builder = KotlinPathBuilder(follower, decelerationType, pathConstraints, globalHeadingInterpolator)
-    builder.init()
-    return builder.build()
-}
+) = KotlinPathBuilder(follower, decelerationType, pathConstraints, globalHeadingInterpolator).apply { init() }.build()
