@@ -4,6 +4,7 @@ import com.pedropathing.geometry.Pose
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
 
 class KotlinPathBuilderTest {
     @Test
@@ -35,5 +36,21 @@ class KotlinPathBuilderTest {
             secondHeadingInterpolator.interpolate(pathPoint),
             HeadingInterpolator.facingPoint(Pose(1.0, 1.0)).interpolate(pathPoint)
         )
+    }
+
+    @Test
+    fun pathChainExample() {
+         pathChain(null) {
+            path {
+                +Pose(0.0, 0.0)
+                +Pose(1.0, 1.0)
+                +Pose(2.0, 0.0)
+                callbacks {
+                    temporalCallback(500.milliseconds) {
+                        println("Reached half a second on this path!")
+                    }
+                }
+            }
+         }
     }
 }
