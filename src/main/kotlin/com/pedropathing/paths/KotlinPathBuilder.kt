@@ -110,9 +110,9 @@ class KotlinPathBuilder internal constructor(
      */
     @PathLinearExperimental
     fun pathToPose(
+        pose: Pose,
         endTime: Double = 1.0,
         pathConstraints: PathConstraints = this.pathConstraints,
-        pose: Pose,
     ) {
         val lastPose = pathChain.lastOrNull()?.lastControlPoint ?: error("No previous path to get starting pose from")
         val path = Path(BezierLine(lastPose, pose), pathConstraints).apply {
