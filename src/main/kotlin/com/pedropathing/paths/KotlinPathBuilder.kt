@@ -186,7 +186,7 @@ class KotlinPathBuilder internal constructor(
  * @return the built PathChain
  */
 fun pathChain(
-    follower: Follower?,
+    follower: Follower? = null,
     decelerationType: PathChain.DecelerationType = PathChain.DecelerationType.LAST_PATH,
     pathConstraints: PathConstraints = PathConstraints.defaultConstraints,
     globalHeadingInterpolator: HeadingInterpolator? = null,
