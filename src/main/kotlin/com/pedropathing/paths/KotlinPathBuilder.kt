@@ -116,7 +116,7 @@ class KotlinPathBuilder internal constructor(
     ) {
         val lastPose = pathChain.lastOrNull()?.lastControlPoint ?: error("No previous path to get starting pose from")
         val path = Path(BezierLine(lastPose, pose), pathConstraints).apply {
-            setHeadingInterpolation(HeadingInterpolator.linear(lastPose.heading, pose.heading))
+            setHeadingInterpolation(HeadingInterpolator.linear(lastPose.heading, pose.heading, endTime))
         }
         pathChain += path
     }
