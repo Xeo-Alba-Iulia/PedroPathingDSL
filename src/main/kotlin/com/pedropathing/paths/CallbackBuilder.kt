@@ -5,6 +5,7 @@ import com.pedropathing.paths.callbacks.ParametricCallback
 import com.pedropathing.paths.callbacks.PathCallback
 import com.pedropathing.paths.callbacks.PoseCallback
 import com.pedropathing.paths.callbacks.TemporalCallback
+import com.pedropathing.util.FiniteRunAction
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -12,7 +13,9 @@ import kotlin.time.DurationUnit
 class CallbackBuilder internal constructor() {
     private var callbacks = mutableListOf<CallbackFactory>()
 
-    fun addCallback(callback: PathCallback) { callbacks.add { _, _, _ -> callback } }
+    fun addCallback(callback: PathCallback) {
+        callbacks.add { _, _, _ -> FiniteRunAction(callback) }
+    }
 
     /**
      * Adds a callback that runs the given [callback] when [isReady] returns true.
@@ -39,38 +42,42 @@ class CallbackBuilder internal constructor() {
      */
     fun addMultiCallback(isReady: () -> Boolean = { true }, callback: () -> Boolean) {
         callbacks.add { pathIndex, _, _ ->
-            object : PathCallback {
+            FiniteRunAction(object : PathCallback {
                 override fun run() = callback()
                 override fun isReady() = isReady()
                 override fun getPathIndex() = pathIndex
-            }
+            })
         }
     }
 
     fun temporalCallback(time: Duration, callback: () -> Unit) {
         callbacks.add { pathIndex, _, _ ->
-            TemporalCallback(pathIndex, time.toDouble(DurationUnit.MILLISECONDS), callback)
+            FiniteRunAction(TemporalCallback(pathIndex, time.toDouble(DurationUnit.MILLISECONDS), callback))
         }
     }
     fun parametricCallback(parametricValue: Double, callback: () -> Unit) {
         callbacks.add { pathIndex, follower, _ ->
-            ParametricCallback(
+            FiniteRunAction(
+                ParametricCallback(
                 pathIndex,
                 parametricValue,
                 follower ?: throw IllegalStateException("Cannot use parametric callback without a follower"),
                 callback
+                )
             )
         }
     }
     fun positionCallback(targetPose: Pose, initialGuess: Double = 0.5, callback: () -> Unit) {
         callbacks.add { pathIndex, follower, curve ->
-            PoseCallback(
+            FiniteRunAction(
+                PoseCallback(
                 follower ?: throw IllegalStateException("Cannot use position callback without a follower"),
                 pathIndex,
                 targetPose,
                 callback,
                 initialGuess,
                 curve
+                )
             )
         }
     }
