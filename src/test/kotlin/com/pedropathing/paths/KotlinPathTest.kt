@@ -14,8 +14,8 @@ class KotlinPathTest {
 
     @Test
     fun `Empty pose list throws exception`() {
-        val path = KotlinPath(::BezierCurve)
-        assertFailsWith(IllegalStateException::class, path::build)
+        val path = KotlinPath()
+        assertFailsWith<IllegalStateException> { path.build(::BezierCurve) }
     }
 
     @Test

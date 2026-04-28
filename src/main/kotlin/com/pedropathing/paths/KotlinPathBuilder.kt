@@ -10,14 +10,14 @@ import com.pedropathing.paths.callbacks.PathCallback
 internal typealias CallbackFactory = (Int, Follower?, Curve) -> PathCallback
 
 @PathMarker
-class KotlinPathBuilder internal constructor(
-    private val follower: Follower?,
-    private val decelerationType: PathChain.DecelerationType,
-    private val pathConstraints: PathConstraints,
-    private val globalHeadingInterpolator: HeadingInterpolator?
+class KotlinPathBuilder @PublishedApi internal constructor(
+    val follower: Follower?,
+    val decelerationType: PathChain.DecelerationType,
+    val pathConstraints: PathConstraints,
+    val globalHeadingInterpolator: HeadingInterpolator?
 ) {
-    private val pathChain = ArrayList<Path>()
-    private val callbacks = ArrayList<PathCallback>()
+    @PublishedApi internal val pathChain = ArrayList<Path>()
+    @PublishedApi internal val callbacks = ArrayList<PathCallback>()
 
     /**
      * Creates a path and adds it to the path chain.
@@ -37,15 +37,15 @@ class KotlinPathBuilder internal constructor(
      *
      * @param init the DSL block to build the path. Poses can be added using [KotlinPath.unaryPlus]
      */
-    fun path(
+    inline fun path(
         pathConstraints: PathConstraints = this.pathConstraints,
         interpolator: HeadingInterpolator = HeadingInterpolator.tangent,
         curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
         init: KotlinPath.() -> Unit,
     ) {
-        val path = KotlinPath(curveFactory)
+        val path = KotlinPath()
         path.init()
-        val (builtPath, pathCallbackFactories) = path.build()
+        val (builtPath, pathCallbackFactories) = path.build(curveFactory)
         callbacks += pathCallbackFactories.map { it(pathChain.size, follower, builtPath.curve) }
         pathChain += builtPath.apply { setHeadingInterpolation(interpolator); setConstraints(pathConstraints) }
     }
@@ -58,10 +58,10 @@ class KotlinPathBuilder internal constructor(
      *
      * @see path
      */
-    fun pathConstantHeading(
+    inline fun pathConstantHeading(
         constantHeading: Double,
         pathConstraints: PathConstraints = this.pathConstraints,
-        curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
+        noinline curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.constant(constantHeading), curveFactory, init)
 
@@ -73,12 +73,12 @@ class KotlinPathBuilder internal constructor(
      *
      * @see path
      */
-    fun pathLinearHeading(
+    inline fun pathLinearHeading(
         startHeading: Double,
         endHeading: Double,
         endTime: Double = 1.0,
         pathConstraints: PathConstraints = this.pathConstraints,
-        curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
+        noinline curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.linear(startHeading, endHeading, endTime), curveFactory, init)
 
@@ -86,15 +86,15 @@ class KotlinPathBuilder internal constructor(
      * Creates a path with a linear heading interpolation between the headings of the first and last control points.
      */
     @PathLinearExperimental
-    fun pathLinearHeading(
+    inline fun pathLinearHeading(
         endTime: Double = 1.0,
         pathConstraints: PathConstraints = this.pathConstraints,
         curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
         init: KotlinPath.() -> Unit,
     ) {
-        val path = KotlinPath(curveFactory)
+        val path = KotlinPath()
         path.init()
-        val (builtPath, pathCallbackFactories) = path.build()
+        val (builtPath, pathCallbackFactories) = path.build(curveFactory)
 
         val startHeading = builtPath.firstControlPoint.heading
         val endHeading = builtPath.lastControlPoint.heading
@@ -129,10 +129,10 @@ class KotlinPathBuilder internal constructor(
      *
      * @see path
      */
-    fun pathFacingPoint(
+    inline fun pathFacingPoint(
         pose: Pose,
         pathConstraints: PathConstraints = this.pathConstraints,
-        curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
+        noinline curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.facingPoint(pose), curveFactory, init)
 
@@ -144,15 +144,15 @@ class KotlinPathBuilder internal constructor(
      *
      * @see path
      */
-    fun pathFacingPoint(
+    inline fun pathFacingPoint(
         x: Double,
         y: Double,
         pathConstraints: PathConstraints = this.pathConstraints,
-        curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
+        noinline curveFactory: (List<Pose>) -> Curve = ::BezierCurve,
         init: KotlinPath.() -> Unit,
     ) = path(pathConstraints, HeadingInterpolator.facingPoint(x, y), curveFactory, init)
 
-    internal fun build() = PathChain(pathChain).apply {
+    @PublishedApi internal fun build() = PathChain(pathChain).apply {
         globalHeadingInterpolator?.let { setHeadingInterpolator(it) }
         decelerationType = this@KotlinPathBuilder.decelerationType
         callbacks = this@KotlinPathBuilder.callbacks
@@ -185,7 +185,7 @@ class KotlinPathBuilder internal constructor(
  * @param init the DSL block to build the PathChain
  * @return the built PathChain
  */
-fun pathChain(
+inline fun pathChain(
     follower: Follower? = null,
     decelerationType: PathChain.DecelerationType = PathChain.DecelerationType.LAST_PATH,
     pathConstraints: PathConstraints = PathConstraints.defaultConstraints,

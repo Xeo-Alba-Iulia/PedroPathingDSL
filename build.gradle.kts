@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.3.20"
     `maven-publish`
 }
 
 group = "com.pedropathing"
-version = "0.3.2"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
@@ -12,7 +12,8 @@ repositories {
 }
 
 dependencies {
-    api("com.pedropathing:core:2.0.5")
+    api("com.pedropathing:core:2.1.1")
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation(kotlin("test-junit5"))
     testImplementation(kotlin("reflect"))
 }

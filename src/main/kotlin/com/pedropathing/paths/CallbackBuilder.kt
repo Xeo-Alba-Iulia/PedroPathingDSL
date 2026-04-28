@@ -11,7 +11,7 @@ import kotlin.time.DurationUnit
 
 @PathMarker
 class CallbackBuilder internal constructor() {
-    private var callbacks = mutableListOf<CallbackFactory>()
+    @PublishedApi internal val callbacks = mutableListOf<CallbackFactory>()
 
     fun addCallback(callback: PathCallback) {
         callbacks.add { _, _, _ -> FiniteRunAction(callback) }
@@ -23,7 +23,7 @@ class CallbackBuilder internal constructor() {
      * @param isReady A function that returns true when the callback should be run.
      * Defaults to true, meaning the callback will run when the path is reached.
      */
-    fun addCallback(isReady: () -> Boolean = { true }, callback: () -> Unit) =
+    inline fun addCallback(crossinline isReady: () -> Boolean = { true }, crossinline callback: () -> Unit) =
         addMultiCallback(isReady) {
             callback()
             true
@@ -40,7 +40,7 @@ class CallbackBuilder internal constructor() {
      *
      * @param callback A function that returns true if the callback should be removed after running.
      */
-    fun addMultiCallback(isReady: () -> Boolean = { true }, callback: () -> Boolean) {
+    inline fun addMultiCallback(crossinline isReady: () -> Boolean = { true }, crossinline callback: () -> Boolean) {
         callbacks.add { pathIndex, _, _ ->
             FiniteRunAction(object : PathCallback {
                 override fun run() = callback()
@@ -81,6 +81,4 @@ class CallbackBuilder internal constructor() {
             )
         }
     }
-
-    internal fun build() = callbacks
 }
