@@ -1,20 +1,27 @@
 package com.pedropathing.paths
 
+import com.pedropathing.follower.Follower
+import com.pedropathing.geometry.Curve
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.callbacks.ParametricCallback
 import com.pedropathing.paths.callbacks.PathCallback
 import com.pedropathing.paths.callbacks.PoseCallback
 import com.pedropathing.paths.callbacks.TemporalCallback
 import com.pedropathing.util.FiniteRunAction
+import java.util.LinkedList
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 @PathMarker
-class CallbackBuilder internal constructor() {
-    @PublishedApi internal val callbacks = mutableListOf<CallbackFactory>()
+class CallbackBuilderKt internal constructor(
+    private val follower: Follower,
+    val pathIndex: Int,
+    val curve: Curve,
+) {
+    internal val callbacks = LinkedList<PathCallback>()
 
     fun addCallback(callback: PathCallback) {
-        callbacks.add { _, _, _ -> FiniteRunAction(callback) }
+        callbacks.add(FiniteRunAction(callback))
     }
 
     /**
@@ -23,7 +30,7 @@ class CallbackBuilder internal constructor() {
      * @param isReady A function that returns true when the callback should be run.
      * Defaults to true, meaning the callback will run when the path is reached.
      */
-    inline fun addCallback(crossinline isReady: () -> Boolean = { true }, crossinline callback: () -> Unit) =
+    fun addCallback(isReady: () -> Boolean = { true }, callback: () -> Unit) =
         addMultiCallback(isReady) {
             callback()
             true
@@ -40,45 +47,46 @@ class CallbackBuilder internal constructor() {
      *
      * @param callback A function that returns true if the callback should be removed after running.
      */
-    inline fun addMultiCallback(crossinline isReady: () -> Boolean = { true }, crossinline callback: () -> Boolean) {
-        callbacks.add { pathIndex, _, _ ->
-            FiniteRunAction(object : PathCallback {
+    fun addMultiCallback(isReady: () -> Boolean = { true }, callback: () -> Boolean) {
+        callbacks.add(
+            object : PathCallback {
+                private val pathIndex = this@CallbackBuilderKt.pathIndex
                 override fun run() = callback()
                 override fun isReady() = isReady()
                 override fun getPathIndex() = pathIndex
-            })
-        }
+            }
+        )
     }
 
     fun temporalCallback(time: Duration, callback: () -> Unit) {
-        callbacks.add { pathIndex, _, _ ->
+        callbacks.add(
             FiniteRunAction(TemporalCallback(pathIndex, time.toDouble(DurationUnit.MILLISECONDS), callback))
-        }
+        )
     }
     fun parametricCallback(parametricValue: Double, callback: () -> Unit) {
-        callbacks.add { pathIndex, follower, _ ->
+        callbacks.add(
             FiniteRunAction(
                 ParametricCallback(
-                pathIndex,
-                parametricValue,
-                follower ?: throw IllegalStateException("Cannot use parametric callback without a follower"),
-                callback
+                    pathIndex,
+                    parametricValue,
+                    follower,
+                    callback
                 )
             )
-        }
+        )
     }
     fun positionCallback(targetPose: Pose, initialGuess: Double = 0.5, callback: () -> Unit) {
-        callbacks.add { pathIndex, follower, curve ->
+        callbacks.add(
             FiniteRunAction(
                 PoseCallback(
-                follower ?: throw IllegalStateException("Cannot use position callback without a follower"),
-                pathIndex,
-                targetPose,
-                callback,
-                initialGuess,
-                curve
+                    follower,
+                    pathIndex,
+                    targetPose,
+                    callback,
+                    initialGuess,
+                    curve
                 )
             )
-        }
+        )
     }
 }

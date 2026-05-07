@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pedropathing"
-version = "0.4.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -16,6 +16,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation(kotlin("test-junit5"))
     testImplementation(kotlin("reflect"))
+    testImplementation("io.mockk:mockk:1.14.9")
 }
 
 tasks.test {

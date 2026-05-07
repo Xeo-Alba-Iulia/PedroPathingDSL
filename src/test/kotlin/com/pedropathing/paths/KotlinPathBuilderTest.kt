@@ -1,24 +1,24 @@
 package com.pedropathing.paths
 
+import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.Pose
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.math.atan2
 import kotlin.time.Duration.Companion.milliseconds
 
 class KotlinPathBuilderTest {
+    val follower = mockk<Follower>().apply {
+        every { constraints } returns PathConstraints(0.0, 0.0)
+    }
+
     @Test
     fun pathFacingPoint() {
-        val path = pathChain(null) {
-            pathFacingPoint(Pose(1.0, 1.0)) {
-                +Pose(0.0, 0.0)
-                +Pose(2.0, 0.0)
-            }
-            pathFacingPoint(1.0, 1.0) {
-                +Pose(0.0, 0.0)
-                +Pose(2.0, 0.0)
-            }
-            build()
+        val path = follower.pathChain {
+            pathFacingPoint(Pose(1.0, 1.0), Pose(0.0, 0.0), Pose(2.0, 0.0))
+            pathFacingPoint(1.0, 1.0, Pose(0.0, 0.0), Pose(2.0, 0.0))
         }
 
         val pathPoint = path.firstPath().getClosestPoint(Pose(0.5, 0.0), 20, 0.5)
@@ -40,15 +40,10 @@ class KotlinPathBuilderTest {
 
     @Test
     fun pathChainExample() {
-         pathChain(null) {
-            path {
-                +Pose(0.0, 0.0)
-                +Pose(1.0, 1.0)
-                +Pose(2.0, 0.0)
-                callbacks {
-                    temporalCallback(500.milliseconds) {
-                        println("Reached half a second on this path!")
-                    }
+        follower.pathChain {
+            path(Pose(0.0, 0.0), Pose(1.0, 1.0), Pose(2.0, 0.0)) {
+                temporalCallback(500.milliseconds) {
+                    println("Reached half a second on this path!")
                 }
             }
          }
