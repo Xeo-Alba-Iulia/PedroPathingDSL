@@ -24,14 +24,12 @@ class PathBuilderKt (
      *
      * Example usage:
      * ```
-     * path {
-     *    +Pose(0.0, 0.0) // Add control points using unaryPlus.
-     *    +Pose(1.0, 1.0) // You can use the return value checker from kotlin 2.3.0
-     *    callbacks {...} // to ensure that the plus sign is not forgotten.
-     * }
+     * path(Pose(0.0, 1.0), Pose(1.0, 1.0))
      * ```
-     * @param pathConstraints the constraints to apply to this path
-     * @param interpolator the heading interpolator to use for this path
+     * @param interpolator The heading interpolator to use for this path.
+     *                     By default, this is [HeadingInterpolator.tangent]
+     * @param pathConstraints The constraints to apply to this path
+     * @param block A callback builder block to add callbacks to this path.
      */
     fun path(
         vararg points: Pose,
@@ -44,11 +42,10 @@ class PathBuilderKt (
     }
 
     /**
-     * Shortcut for
+     * Shortcut for:
      * ```
-     * path(interpolator = HeadingInterpolator.constant(constantHeading))
+     * path(interpolator = HeadingInterpolator.constant(heading))
      * ```
-     *
      * @see path
      */
     fun pathConstantHeading(
@@ -64,11 +61,12 @@ class PathBuilderKt (
     )
 
     /**
-     * Shortcut for
+     * Creates a path with a linear [HeadingInterpolator][HeadingInterpolator.linear]
+     *
+     * Shortcut for:
      * ```
      * path(interpolator = HeadingInterpolator.linear(startHeading, endHeading, endTime))
      * ```
-     *
      * @see path
      */
     fun pathLinearHeading(
@@ -88,7 +86,6 @@ class PathBuilderKt (
     /**
      * Creates a path with a linear heading interpolation between the headings of the first and last control points.
      */
-    @PathLinearExperimental
     fun pathLinearHeading(
         vararg points: Pose,
         endTime: Double = 1.0,
@@ -106,6 +103,8 @@ class PathBuilderKt (
     /**
      * Creates a path from the last control point of the previous path to the specified pose,
      * with a linear heading interpolation between the headings of the start and end poses.
+     *
+     * @see pathLinearHeading
      */
     @PathLinearExperimental
     fun pathToPose(
@@ -122,11 +121,12 @@ class PathBuilderKt (
     )
 
     /**
-     * Shortcut for
+     * Creates a path with the robot always looking towards the [targetPose] while following the path.
+     *
+     * Shortcut for:
      * ```
      * path(interpolator = HeadingInterpolator.facingPoint(pose))
      * ```
-     *
      * @see path
      */
     fun pathFacingPoint(
@@ -142,11 +142,12 @@ class PathBuilderKt (
     )
 
     /**
-     * Shortcut for
+     * Creates a path with the robot always looking towards `Pose(x, y)` while following the path.
+     *
+     * Shortcut for:
      * ```
      * path(interpolator = HeadingInterpolator.facingPoint(x, y))
      * ```
-     *
      * @see path
      */
     fun pathFacingPoint(
