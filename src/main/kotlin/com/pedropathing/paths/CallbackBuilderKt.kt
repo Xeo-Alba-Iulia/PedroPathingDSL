@@ -37,9 +37,9 @@ class CallbackBuilderKt internal constructor(
         }
 
     private class PathCallbackImpl(
-        val pathIndex: Int,
-        val isReady: () -> Boolean,
-        val callback: () -> Boolean,
+        private val pathIndex: Int,
+        private val isReady: () -> Boolean,
+        private val callback: () -> Boolean,
     ) : PathCallback {
         override fun run() = callback()
         override fun isReady() = isReady.invoke()
