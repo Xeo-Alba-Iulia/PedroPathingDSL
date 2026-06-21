@@ -31,10 +31,10 @@ class CallbackBuilderKt internal constructor(
      * Defaults to true, meaning the callback will run when the path is reached.
      */
     fun addCallback(isReady: () -> Boolean = { true }, callback: () -> Unit) =
-        addMultiCallback(isReady) {
+        addCallback(PathCallbackImpl(pathIndex, isReady) {
             callback()
             true
-        }
+        })
 
     private class PathCallbackImpl(
         private val pathIndex: Int,
