@@ -27,6 +27,6 @@ class CallbackBuilderScope @PublishedApi internal constructor(val curve: Curve) 
     fun poseCallback(pose: Pose, callback: () -> Unit) =
         parametricCallback(curve.closestParameter(pose.toVector2D()), callback)
 
-    @PublishedApi internal val callbacks: MutableList<Callback> = LinkedList<Callback>()
+    private val callbacks: MutableList<Callback> = LinkedList<Callback>()
     fun build(): MutableList<Callback> = callbacks
 }

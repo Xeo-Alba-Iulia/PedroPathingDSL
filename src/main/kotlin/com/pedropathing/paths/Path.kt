@@ -2,11 +2,14 @@ package com.pedropathing.paths
 
 import com.pedropathing.config.Modifier
 import com.pedropathing.math.Pose
+import com.pedropathing.paths.PathBuilderScope.Companion.NOT_ENOUGH_POINTS_ERR_MSG
 import com.pedropathing.paths.curves.Curve
 import com.pedropathing.paths.curves.Line
 import com.pedropathing.paths.curves.bezier.BezierCurve
 import com.pedropathing.paths.interpolator.Interpolator
+import org.jetbrains.annotations.Contract
 
+@Contract("_, _, _ -> new", pure = false)
 inline fun path(
     interpolator: Interpolator? = null,
     modifiers: List<Modifier> = emptyList(),
@@ -35,3 +38,12 @@ fun createCurve(points: Array<out Pose>): Curve {
 fun getHeadingInterpolator(startHeading: Double, endHeading: Double): Interpolator =
     if (startHeading == endHeading) Interpolator.constant(startHeading)
     else Interpolator.linear(startHeading, endHeading)
+
+/**
+ * Returns a linear interpolator based on the headings of the endpoints.
+ * If the headings are the same, it will return a constant interpolator.
+ */
+fun getHeadingInterpolator(vararg points: Pose): Interpolator {
+    require(points.size > 1) { NOT_ENOUGH_POINTS_ERR_MSG }
+    return getHeadingInterpolator(points.first().heading(), points.last().heading())
+}
