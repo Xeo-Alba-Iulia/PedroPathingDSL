@@ -11,12 +11,12 @@ class CallbackTests {
     @Disabled("This test depends on the JVM it runs on")
     fun callbackGetsGCTest() {
         for (i in 0..50) {
-            val path = path {
+            val _ = path {
                 constant(Pose(0.0, 0.0, 0.0), Pose(1.0, 1.0, 0.0)) {
                     temporalCallback(100.milliseconds) { println(i) }
                 }
             }
-            if (CallbackRunner.callbacks.size < i) return
+            if (callbacks.size < i) return
             System.gc()
         }
         return fail("callback map should be garbage collected")

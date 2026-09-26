@@ -6,12 +6,13 @@ import com.pedropathing.paths.curves.Curve
 import java.util.WeakHashMap
 
 object CallbackRunner {
-    val callbacks = WeakHashMap<Curve, MutableList<Callback>>()
+    private var lastCurve: Curve? = null
 
     fun update(follower: Follower) {
         val curve = follower.currentCurve()
-        val callbacks = callbacks[curve] ?: return
-        val iter = callbacks.iterator()
+        if (lastCurve != null && lastCurve != curve) callbacks -= lastCurve
+        val currentCallbackList = callbacks[curve] ?: return
+        val iter = currentCallbackList.iterator()
         while(iter.hasNext()) {
             val current = iter.next()
             if (current.shouldRun(follower)) {
@@ -19,6 +20,8 @@ object CallbackRunner {
                 iter.remove()
             }
         }
-        if (callbacks.isEmpty()) this.callbacks -= curve
+        if (currentCallbackList.isEmpty()) callbacks -= curve
     }
 }
+
+@InternalCallbacksApi val callbacks = WeakHashMap<Curve, MutableList<Callback>>()

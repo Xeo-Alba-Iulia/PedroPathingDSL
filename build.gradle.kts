@@ -11,6 +11,13 @@ repositories {
     maven("https://repo.dairy.foundation/releases/")
 }
 
+kotlin {
+    compilerOptions {
+        optIn.add("com.pedropathing.paths.InternalCallbacksApi")
+        freeCompilerArgs.add("-Xreturn-value-checker=full")
+    }
+}
+
 dependencies {
     api("com.pedropathing:core") {
         version {

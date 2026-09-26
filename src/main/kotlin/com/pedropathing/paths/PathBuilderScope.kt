@@ -37,6 +37,8 @@ class PathBuilderScope @PublishedApi internal constructor() {
      * Only use this function if you have a custom curve implementation that you want to use.
      *
      * @param curve The curve to be used for the path.
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun path(
         curve: Curve,
@@ -58,6 +60,8 @@ class PathBuilderScope @PublishedApi internal constructor() {
      * from the given points.
      *
      * @param points The points defining the curve.
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun path(
         vararg points: Pose,
@@ -68,6 +72,10 @@ class PathBuilderScope @PublishedApi internal constructor() {
 
     /**
      * Creates a path with a tangent heading interpolation.
+     *
+     *
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun tangent(
         vararg points: Pose,
@@ -77,6 +85,9 @@ class PathBuilderScope @PublishedApi internal constructor() {
 
     /**
      * Creates a path with linear heading interpolation.
+     *
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun linear(
         vararg points: Pose,
@@ -90,6 +101,9 @@ class PathBuilderScope @PublishedApi internal constructor() {
      * Creates a path with linear heading interpolation.
      *
      * The heading of the first and last point will be used as the start and end headings.
+     *
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun linear(
         vararg points: Pose,
@@ -102,6 +116,8 @@ class PathBuilderScope @PublishedApi internal constructor() {
      *
      * @param points The points defining the curve.
      * @param heading The constant heading to be maintained along the path.
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun constant(
         vararg points: Pose,
@@ -115,6 +131,8 @@ class PathBuilderScope @PublishedApi internal constructor() {
      *
      * The heading of the first and last points must match exactly.
      *
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      * @throws IllegalStateException If the start and end point headings do not match.
      */
     inline fun constant(
@@ -131,6 +149,9 @@ class PathBuilderScope @PublishedApi internal constructor() {
 
     /**
      * Creates a path with a heading interpolation that faces the given [target].
+     *
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun facingPoint(
         vararg points: Pose,
@@ -146,8 +167,9 @@ class PathBuilderScope @PublishedApi internal constructor() {
      * @param interpolator Path heading interpolator.
      *                     By default, it will be set to a linear interpolator between
      *                     the last heading and the target heading.
-     * @param block A lambda to define path callbacks within the generated path context.
+     * @param block An optional context block that can be used to define callbacks for the path.
      * @throws IllegalStateException If no paths exist before calling this function.
+     * @see CallbackBuilderScope
      */
     inline fun pathToPoint(
         endPoint: Pose,
@@ -169,6 +191,10 @@ class PathBuilderScope @PublishedApi internal constructor() {
      * Creates a path that passes through the given [points].
      *
      * If no [interpolator] is provided, it will be set to a linear interpolator between the first and last point headings.
+     * @param interpolator Interpolator to be used for the path.
+     *                     Defaults to a linear interpolator between the first and last points headings.
+     * @param block An optional context block that can be used to define callbacks for the path.
+     * @see CallbackBuilderScope
      */
     inline fun through(
         vararg points: Pose,
@@ -177,12 +203,27 @@ class PathBuilderScope @PublishedApi internal constructor() {
         block: CallbackBuilderScope.() -> Unit = {}
     ) = path(BezierCurve.through(*points), interpolator, modifiers, block)
 
+    /**
+     * Returns the heading at the end of the last path.
+     *
+     * @throws NoSuchElementException If no paths have been created yet.
+     * @throws IllegalStateException If the last path has no heading.
+     */
     val lastHeading get() =
         paths.lastOrNull()?.heading(1.0) ?: throw NoSuchElementException(EMPTY_PATHS_ERR_MSG)
 
     @PublishedApi internal val paths = mutableListOf<Path>()
     @PublishedApi internal val callbacks = mutableMapOf<Curve, MutableList<Callback>>()
 
+    /**
+     * Adds callbacks associated with the specified curve to the internal collection of callbacks.
+     *
+     * This function builds the callbacks defined within the provided block and appends them
+     * to the internal collection if any are created.
+     *
+     * @param curve The curve for which the callbacks are being defined.
+     * @param block A lambda within the [CallbackBuilderScope] to define callbacks associated with the curve.
+     */
     @PublishedApi internal inline fun addCallbacks(curve: Curve, block: CallbackBuilderScope.() -> Unit) {
         CallbackBuilderScope(curve)
             .apply(block)
@@ -191,6 +232,18 @@ class PathBuilderScope @PublishedApi internal constructor() {
             ?.let { callbacks += curve to it }
     }
 
+    /**
+     * Builds and returns a pair containing the constructed path and the associated callbacks.
+     *
+     * This method ensures that at least one path exists before being invoked. If only one path
+     * is available, it directly returns that path along with its callbacks. If multiple paths
+     * exist, they are combined using `Paths.path()` and the resulting combined path is returned
+     * with its callbacks.
+     *
+     * @return A pair where the first element is the `Path` representing the constructed path(s)
+     * and the second element is a mutable map of `Curve` to their respective callbacks.
+     * @throws IllegalStateException If no paths have been created prior to invocation.
+     */
     @PublishedApi internal fun build(): Pair<Path, MutableMap<Curve, MutableList<Callback>>> {
         check(paths.isNotEmpty()) { "No paths have been created yet" }
         if (paths.size == 1) return paths[0] to callbacks
