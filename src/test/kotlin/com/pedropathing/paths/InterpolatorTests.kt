@@ -2,17 +2,19 @@ package com.pedropathing.paths
 
 import com.pedropathing.api.Paths
 import com.pedropathing.math.Pose
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.assertNotNull
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import kotlin.math.PI
 import kotlin.math.atan2
-import kotlin.test.ExperimentalKotlinTestApi
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class InterpolatorTests {
-    @OptIn(ExperimentalKotlinTestApi::class)
-    @Test
-    fun testTangent() {
+    @ParameterizedTest
+    @ValueSource(doubles = [0.0, 0.25, 0.3, 0.5, 0.75, 1.0])
+    fun testTangent(ratio: Double) {
         val startPose = Pose.zero()
         val endPose = Pose(10.0, 5.0, 90.0)
         val path = path {
@@ -20,18 +22,9 @@ class InterpolatorTests {
         }
 
         val expectedHeading = atan2(endPose.y() - startPose.y(), endPose.x() - startPose.x())
-        for (i in 0..100 step 30) {
-            val ratio = i / 100.0
-            val expectedPose = Pose.interpolate(startPose, endPose, ratio).withHeading(expectedHeading)
-            val actualPose = path[ratio]
-            assertTrue(poseEquals(expectedPose, actualPose)) {
-                buildString {
-                    appendLine("Expected: $expectedPose")
-                    appendLine("Actual: ${path[ratio]}")
-                    appendLine("Ratio: $ratio")
-                }
-            }
-        }
+        val expectedPose = Pose.interpolate(startPose, endPose, ratio).withHeading(expectedHeading)
+        val actualPose = path[ratio]
+        assertPoseEquals(expectedPose, actualPose)
     }
 
     @Test
@@ -45,7 +38,7 @@ class InterpolatorTests {
         }
 
         for (i in 0..100 step 5) {
-            assertTrue(poseEquals(path[i / 100.0], pedroPath[i / 100.0]))
+            assertPoseEquals(path[i / 100.0], pedroPath[i / 100.0])
         }
     }
 
@@ -61,6 +54,9 @@ class InterpolatorTests {
             assertEquals(endPose.heading() * ratio, path.heading(ratio), 0.001)
         }
     }
+    fun assertPoseEquals(expectedPose: Pose, actualPose: Pose) = assertAll("Pose properties",
+        { assertEquals(expectedPose.x(), actualPose.x(), "x") },
+        { assertEquals(expectedPose.y(), actualPose.y(), "y") },
+        { assertEquals(expectedPose.heading(), actualPose.heading(), "heading") },
+    )
 }
-
-fun poseEquals(a: Pose, b: Pose) = a.x() == b.x() && a.y() == b.y() && a.heading() == b.heading()

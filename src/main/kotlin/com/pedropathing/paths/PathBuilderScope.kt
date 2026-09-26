@@ -163,7 +163,7 @@ class PathBuilderScope @PublishedApi internal constructor() {
                     modifiers = modifiers,
                     block = block
                 )
-            } ?: throw IllegalStateException(EMPTY_PATHS_ERR_MSG)
+            } ?: throw NoSuchElementException(EMPTY_PATHS_ERR_MSG)
 
     /**
      * Creates a path that passes through the given [points].
@@ -178,7 +178,7 @@ class PathBuilderScope @PublishedApi internal constructor() {
     ) = path(BezierCurve.through(*points), interpolator, modifiers, block)
 
     val lastHeading get() =
-        paths.lastOrNull()?.heading(1.0) ?: throw IllegalStateException(EMPTY_PATHS_ERR_MSG)
+        paths.lastOrNull()?.heading(1.0) ?: throw NoSuchElementException(EMPTY_PATHS_ERR_MSG)
 
     @PublishedApi internal val paths = mutableListOf<Path>()
     @PublishedApi internal val callbacks = mutableMapOf<Curve, MutableList<Callback>>()
@@ -193,7 +193,8 @@ class PathBuilderScope @PublishedApi internal constructor() {
 
     @PublishedApi internal fun build(): Pair<Path, MutableMap<Curve, MutableList<Callback>>> {
         check(paths.isNotEmpty()) { "No paths have been created yet" }
-        return Pair(Paths.path(*paths.toTypedArray()), callbacks)
+        if (paths.size == 1) return paths[0] to callbacks
+        return Paths.path(*paths.toTypedArray()) to callbacks
     }
 
     companion object {

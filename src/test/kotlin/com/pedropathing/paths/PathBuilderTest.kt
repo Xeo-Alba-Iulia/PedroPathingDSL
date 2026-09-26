@@ -3,8 +3,8 @@ package com.pedropathing.paths
 import com.pedropathing.config.Modifier
 import com.pedropathing.math.Pose
 import com.pedropathing.paths.interpolator.Interpolator
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class PathBuilderTest {
     @Test
@@ -21,8 +21,8 @@ class PathBuilderTest {
         val emptyArray = arrayOf<Pose>()
         val singlePose = arrayOf(Pose(0.0, 0.0, 0.0))
         nonEmptyPath {
-            assertFailsWith<IllegalArgumentException> { linear(*emptyArray) }
-            assertFailsWith<IllegalArgumentException> { linear(*singlePose) }
+            assertThrows<IllegalArgumentException> { linear(*emptyArray) }
+            assertThrows<IllegalArgumentException> { linear(*singlePose) }
         }
     }
 
@@ -30,21 +30,21 @@ class PathBuilderTest {
     fun pathFailsOnNonMatchingHeadings() {
         val nonMatchingHeadings = arrayOf(Pose(0.0, 0.0, 0.0), Pose(1.0, 1.0, 90.0))
         nonEmptyPath {
-            assertFailsWith<IllegalArgumentException> { constant(*nonMatchingHeadings) }
+            assertThrows<IllegalArgumentException> { constant(*nonMatchingHeadings) }
         }
     }
 
     @Test
     fun pathFailsOnEmptyPath() {
-        assertFailsWith<IllegalStateException> { path {} }
+        assertThrows<IllegalStateException> { path {} }
     }
-}
 
-fun nonEmptyPath(
-    interpolator: Interpolator? = null,
-    modifiers: List<Modifier> = emptyList(),
-    block: PathBuilderScope.() -> Unit
-) = PathBuilderScope().apply {
-    tangent(Pose(0.0, 0.0, 0.0), Pose(1.0, 1.0, 0.0))
-    block()
+    fun nonEmptyPath(
+        interpolator: Interpolator? = null,
+        modifiers: List<Modifier> = emptyList(),
+        block: PathBuilderScope.() -> Unit
+    ) = PathBuilderScope().apply {
+        tangent(Pose(0.0, 0.0, 0.0), Pose(1.0, 1.0, 0.0))
+        block()
+    }
 }

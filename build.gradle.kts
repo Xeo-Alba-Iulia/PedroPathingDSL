@@ -18,14 +18,16 @@ dependencies {
             prefer("3.0.1")
         }
     }
-    testImplementation(platform("org.junit:junit-bom:6.0.3"))
-    testImplementation(kotlin("test-junit5"))
-    testImplementation(kotlin("reflect"))
-    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
 
 publishing {

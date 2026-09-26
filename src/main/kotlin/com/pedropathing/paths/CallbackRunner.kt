@@ -3,9 +3,10 @@ package com.pedropathing.paths
 import com.pedropathing.follower.Follower
 import com.pedropathing.paths.callbacks.Callback
 import com.pedropathing.paths.curves.Curve
+import java.util.WeakHashMap
 
 object CallbackRunner {
-    val callbacks = mutableMapOf<Curve, MutableList<Callback>>()
+    val callbacks = WeakHashMap<Curve, MutableList<Callback>>()
 
     fun update(follower: Follower) {
         val curve = follower.currentCurve()
