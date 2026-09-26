@@ -1,10 +1,9 @@
-package com.pedropathing.paths
+package com.pedropathing.paths.callbacks
 
 import com.pedropathing.follower.Follower
-import com.pedropathing.paths.callbacks.Callback
 import com.pedropathing.paths.curves.Curve
-import java.util.WeakHashMap
 
+@ExperimentalCallbacksApi
 object CallbackRunner {
     private var lastCurve: Curve? = null
 
@@ -23,5 +22,3 @@ object CallbackRunner {
         if (currentCallbackList.isEmpty()) callbacks -= curve
     }
 }
-
-@InternalCallbacksApi val callbacks = WeakHashMap<Curve, MutableList<Callback>>()

@@ -1,0 +1,47 @@
+plugins {
+    kotlin("jvm")
+    `maven-publish`
+}
+
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    compilerOptions {
+        optIn.add("com.pedropathing.paths.InternalCallbacksApi")
+        freeCompilerArgs.add("-Xreturn-value-checker=full")
+    }
+}
+
+configurations {
+    apiElements {
+        outgoing {
+            capability("com.pedropathing:callback-runner-jvm:${version}")
+            capability("com.pedropathing:callback-runner:${version}")
+        }
+    }
+    runtimeElements {
+        outgoing {
+            capability("com.pedropathing:callback-runner-jvm:${version}")
+            capability("com.pedropathing:callback-runner:${version}")
+        }
+    }
+}
+
+dependencies {
+    compileOnly(project(":"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("CallbackRunnerJvm") {
+            from(components["java"])
+            artifactId = "callback-runner-jvm"
+        }
+    }
+}

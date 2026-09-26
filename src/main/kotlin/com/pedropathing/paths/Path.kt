@@ -3,6 +3,7 @@ package com.pedropathing.paths
 import com.pedropathing.config.Modifier
 import com.pedropathing.math.Pose
 import com.pedropathing.paths.PathBuilderScope.Companion.NOT_ENOUGH_POINTS_ERR_MSG
+import com.pedropathing.paths.callbacks.callbacks
 import com.pedropathing.paths.curves.Curve
 import com.pedropathing.paths.curves.Line
 import com.pedropathing.paths.curves.bezier.BezierCurve

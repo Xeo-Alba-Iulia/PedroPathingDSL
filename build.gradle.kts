@@ -41,9 +41,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            groupId = project.group.toString()
             artifactId = "builder-dsl"
-            version = project.version.toString()
         }
     }
 }
