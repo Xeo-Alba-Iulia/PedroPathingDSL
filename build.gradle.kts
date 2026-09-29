@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pedropathing"
-version = "1.0.0"
+version = "2.0.0"
 
 repositories {
     mavenCentral()
@@ -12,6 +12,7 @@ repositories {
 }
 
 kotlin {
+    jvmToolchain(8)
     compilerOptions {
         optIn.add("com.pedropathing.paths.InternalCallbacksApi")
         freeCompilerArgs.add("-Xreturn-value-checker=full")
@@ -25,7 +26,7 @@ dependencies {
             prefer("3.0.1")
         }
     }
-    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation(platform("org.junit:junit-bom:5.11.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

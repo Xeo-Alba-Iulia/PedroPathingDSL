@@ -3,6 +3,9 @@ plugins {
     `maven-publish`
 }
 
+version = project(":").version
+group = project(":").group
+
 repositories {
     mavenCentral()
 }
