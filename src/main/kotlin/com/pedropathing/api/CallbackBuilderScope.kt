@@ -1,10 +1,10 @@
-package com.pedropathing.paths
+package com.pedropathing.api
 
 import com.pedropathing.follower.Follower
 import com.pedropathing.math.Pose
-import com.pedropathing.paths.callbacks.Callback
-import com.pedropathing.paths.callbacks.ParametricCallback
-import com.pedropathing.paths.callbacks.TemporalCallback
+import com.pedropathing.callbacks.Callback
+import com.pedropathing.callbacks.ParametricCallback
+import com.pedropathing.callbacks.TemporalCallback
 import com.pedropathing.paths.curves.Curve
 import java.util.LinkedList
 import kotlin.time.Duration

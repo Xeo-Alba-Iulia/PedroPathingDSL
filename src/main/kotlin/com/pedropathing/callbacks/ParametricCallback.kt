@@ -1,4 +1,4 @@
-package com.pedropathing.paths.callbacks
+package com.pedropathing.callbacks
 
 import com.pedropathing.follower.Follower
 import com.pedropathing.paths.TValue

@@ -1,7 +1,6 @@
-package com.pedropathing.paths.callbacks
+package com.pedropathing.callbacks
 
 import com.pedropathing.follower.Follower
-import com.pedropathing.paths.InternalCallbacksApi
 import com.pedropathing.paths.curves.Curve
 import java.util.WeakHashMap
 
@@ -10,4 +9,4 @@ interface Callback {
     fun callback()
 }
 
-@InternalCallbacksApi val callbacks = WeakHashMap<Curve, MutableList<Callback>>()
+@InternalCallbacksApi val callbacksMap = WeakHashMap<Curve, MutableList<Callback>>()

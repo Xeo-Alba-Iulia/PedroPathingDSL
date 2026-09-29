@@ -1,7 +1,9 @@
-package com.pedropathing.paths
+package com.pedropathing
 
+import com.pedropathing.api.path
 import com.pedropathing.math.Pose
-import org.junit.jupiter.api.Assertions.fail
+import com.pedropathing.callbacks.callbacksMap
+import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.milliseconds
@@ -16,10 +18,10 @@ class CallbackTests {
                     temporalCallback(100.milliseconds) { println(i) }
                 }
             }
-            if (callbacks.size < i) return
+            if (callbacksMap.size < i) return
             System.gc()
         }
-        return fail("callback map should be garbage collected")
+        fail("callback map should be garbage collected")
     }
 
     // TODO: Mock the follower to check for callback execution

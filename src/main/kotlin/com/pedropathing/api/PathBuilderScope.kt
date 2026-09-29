@@ -1,9 +1,9 @@
-package com.pedropathing.paths
+package com.pedropathing.api
 
-import com.pedropathing.api.Paths
 import com.pedropathing.config.Modifier
 import com.pedropathing.math.Pose
-import com.pedropathing.paths.callbacks.Callback
+import com.pedropathing.paths.Path
+import com.pedropathing.callbacks.Callback
 import com.pedropathing.paths.curves.Curve
 import com.pedropathing.paths.curves.bezier.BezierCurve
 import com.pedropathing.paths.interpolator.Interpolator
@@ -46,9 +46,7 @@ class PathBuilderScope @PublishedApi internal constructor() {
         modifiers: List<Modifier> = emptyList(),
         block: CallbackBuilderScope.() -> Unit = {}
     ) {
-        val path = Paths.path(curve).heading(interpolator).let { path ->
-            if (modifiers.isNotEmpty()) path.with(modifiers) else path
-        }
+        val path = applyHeadingAndModifiers(Paths.path(curve), interpolator, modifiers)
         paths += path
         addCallbacks(path.curve, block)
     }
@@ -56,7 +54,7 @@ class PathBuilderScope @PublishedApi internal constructor() {
     /**
      * Creates a path from a list of [points].
      * This function is a shorthand for creating
-     * either a [com.pedropathing.paths.curves.Line] o a [com.pedropathing.paths.curves.bezier.BezierCurve]
+     * either a [com.pedropathing.paths.curves.Line] o a [BezierCurve]
      * from the given points.
      *
      * @param points The points defining the curve.

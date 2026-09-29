@@ -14,7 +14,7 @@ repositories {
 kotlin {
     jvmToolchain(8)
     compilerOptions {
-        optIn.add("com.pedropathing.paths.InternalCallbacksApi")
+        optIn.add("com.pedropathing.callbacks.InternalCallbacksApi")
         freeCompilerArgs.add("-Xreturn-value-checker=full")
     }
 }
@@ -36,6 +36,10 @@ tasks.test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+}
+
+java {
+    withSourcesJar()
 }
 
 publishing {

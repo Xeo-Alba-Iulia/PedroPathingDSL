@@ -1,4 +1,4 @@
-package com.pedropathing.paths
+package com.pedropathing.callbacks
 
 /**
  * Marks declarations that are internal to the callback API and should not be used by external code.

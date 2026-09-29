@@ -1,5 +1,7 @@
-package com.pedropathing.paths
+package com.pedropathing
 
+import com.pedropathing.api.PathBuilderScope
+import com.pedropathing.api.path
 import com.pedropathing.config.Modifier
 import com.pedropathing.math.Pose
 import com.pedropathing.paths.interpolator.Interpolator
@@ -9,7 +11,7 @@ import org.junit.jupiter.api.assertThrows
 class PathBuilderTest {
     @Test
     fun simplePathTest() {
-        path {
+        val _ = path {
             linear(Pose(0.0, 0.0, 0.0), Pose(1.0, 1.0, 0.0))
             tangent(Pose(1.0, 1.0, 0.0), Pose(2.0, 2.0, 0.0))
             constant(Pose(2.0, 2.0, 45.0), Pose(10.0, 10.0, 45.0))
@@ -20,7 +22,7 @@ class PathBuilderTest {
     fun pathFailsOnLessThanTwoPoints() {
         val emptyArray = arrayOf<Pose>()
         val singlePose = arrayOf(Pose(0.0, 0.0, 0.0))
-        nonEmptyPath {
+        val _ = nonEmptyPath {
             assertThrows<IllegalArgumentException> { linear(*emptyArray) }
             assertThrows<IllegalArgumentException> { linear(*singlePose) }
         }
@@ -29,14 +31,14 @@ class PathBuilderTest {
     @Test
     fun pathFailsOnNonMatchingHeadings() {
         val nonMatchingHeadings = arrayOf(Pose(0.0, 0.0, 0.0), Pose(1.0, 1.0, 90.0))
-        nonEmptyPath {
+        val _ = nonEmptyPath {
             assertThrows<IllegalArgumentException> { constant(*nonMatchingHeadings) }
         }
     }
 
     @Test
     fun pathFailsOnEmptyPath() {
-        assertThrows<IllegalStateException> { path {} }
+        val _ = assertThrows<IllegalStateException> { val _ = path {} }
     }
 
     fun nonEmptyPath(

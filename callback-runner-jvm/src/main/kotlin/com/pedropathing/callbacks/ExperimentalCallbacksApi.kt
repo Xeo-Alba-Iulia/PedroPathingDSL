@@ -1,4 +1,4 @@
-package com.pedropathing.paths.callbacks
+package com.pedropathing.callbacks
 
 /**
  * Marks the global callback runner as experimental.

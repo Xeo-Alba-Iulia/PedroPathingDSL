@@ -1,4 +1,4 @@
-package com.pedropathing.paths.callbacks
+package com.pedropathing.callbacks
 
 import com.pedropathing.follower.Follower
 import com.pedropathing.paths.curves.Curve
@@ -9,8 +9,8 @@ object CallbackRunner {
 
     fun update(follower: Follower) {
         val curve = follower.currentCurve()
-        if (lastCurve != null && lastCurve != curve) callbacks -= lastCurve
-        val currentCallbackList = callbacks[curve] ?: return
+        if (lastCurve != null && lastCurve != curve) callbacksMap -= lastCurve
+        val currentCallbackList = callbacksMap[curve] ?: return
         val iter = currentCallbackList.iterator()
         while(iter.hasNext()) {
             val current = iter.next()
@@ -19,6 +19,6 @@ object CallbackRunner {
                 iter.remove()
             }
         }
-        if (currentCallbackList.isEmpty()) callbacks -= curve
+        if (currentCallbackList.isEmpty()) callbacksMap -= curve
     }
 }

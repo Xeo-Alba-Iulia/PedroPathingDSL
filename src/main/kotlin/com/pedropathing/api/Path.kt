@@ -1,9 +1,9 @@
-package com.pedropathing.paths
+package com.pedropathing.api
 
 import com.pedropathing.config.Modifier
 import com.pedropathing.math.Pose
-import com.pedropathing.paths.PathBuilderScope.Companion.NOT_ENOUGH_POINTS_ERR_MSG
-import com.pedropathing.paths.callbacks.callbacks
+import com.pedropathing.paths.Path
+import com.pedropathing.callbacks.callbacksMap
 import com.pedropathing.paths.curves.Curve
 import com.pedropathing.paths.curves.Line
 import com.pedropathing.paths.curves.bezier.BezierCurve
@@ -11,7 +11,7 @@ import com.pedropathing.paths.interpolator.Interpolator
 import org.jetbrains.annotations.Contract
 
 /**
- * Creates a new [Path] from the given [block].
+ * Creates a new [com.pedropathing.paths.Path] from the given [block].
  *
  * @param interpolator Global interpolator to be applied to the path.
  *                     All the functions defined in [PathBuilderScope] also take an optional [interpolator] parameter.
@@ -30,7 +30,7 @@ inline fun path(
 ): Path {
     val (path, currentCallbacks) = PathBuilderScope().apply(block).build()
     val pathWithModifiers = applyHeadingAndModifiers(path, interpolator, modifiers)
-    callbacks += currentCallbacks
+    callbacksMap += currentCallbacks
     return pathWithModifiers
 }
 
@@ -68,6 +68,6 @@ fun getHeadingInterpolator(startHeading: Double, endHeading: Double): Interpolat
  * If the headings are the same, it will return a constant interpolator.
  */
 fun getHeadingInterpolator(vararg points: Pose): Interpolator {
-    require(points.size > 1) { NOT_ENOUGH_POINTS_ERR_MSG }
+    require(points.size > 1) { PathBuilderScope.NOT_ENOUGH_POINTS_ERR_MSG }
     return getHeadingInterpolator(points.first().heading(), points.last().heading())
 }

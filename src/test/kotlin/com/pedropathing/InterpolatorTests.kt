@@ -1,11 +1,11 @@
-package com.pedropathing.paths
+package com.pedropathing
 
 import com.pedropathing.api.Paths
+import com.pedropathing.api.path
 import com.pedropathing.math.Pose
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.math.PI
@@ -51,12 +51,13 @@ class InterpolatorTests {
         }
         for (i in 0..100 step 10) {
             val ratio = i / 100.0
-            assertEquals(endPose.heading() * ratio, path.heading(ratio), 0.001)
+            Assertions.assertEquals(endPose.heading() * ratio, path.heading(ratio), 0.001)
         }
     }
-    fun assertPoseEquals(expectedPose: Pose, actualPose: Pose) = assertAll("Pose properties",
-        { assertEquals(expectedPose.x(), actualPose.x(), "x") },
-        { assertEquals(expectedPose.y(), actualPose.y(), "y") },
-        { assertEquals(expectedPose.heading(), actualPose.heading(), "heading") },
+    fun assertPoseEquals(expectedPose: Pose, actualPose: Pose) = assertAll(
+        "Pose properties",
+        { Assertions.assertEquals(expectedPose.x(), actualPose.x(), "x") },
+        { Assertions.assertEquals(expectedPose.y(), actualPose.y(), "y") },
+        { Assertions.assertEquals(expectedPose.heading(), actualPose.heading(), "heading") },
     )
 }
