@@ -10,6 +10,7 @@ object CallbackRunner {
     fun update(follower: Follower) {
         val curve = follower.currentCurve()
         if (lastCurve != null && lastCurve != curve) callbacksMap -= lastCurve
+        lastCurve = curve
         val currentCallbackList = callbacksMap[curve] ?: return
         val iter = currentCallbackList.iterator()
         while(iter.hasNext()) {
