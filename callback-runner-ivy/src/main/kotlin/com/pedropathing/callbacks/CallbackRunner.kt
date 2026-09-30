@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.RobotLog
 class CallbackRunner(private val follower: Follower) : Command {
     private var lastCurve: Curve? = null
 
-    override fun requirements() = setOf(callbackLock)
+    override fun requirements() = setOf(this, callbackLock)
     override fun priority() = 0
     override fun interruptedBehavior() = InterruptedBehavior.SUSPEND
     override fun conflictBehavior() = ConflictBehavior.QUEUE

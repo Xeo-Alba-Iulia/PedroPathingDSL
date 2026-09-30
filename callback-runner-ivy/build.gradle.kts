@@ -1,5 +1,6 @@
 plugins {
     id("com.android.library")
+    `maven-publish`
 }
 
 kotlin {
@@ -13,9 +14,7 @@ kotlin {
 android {
     namespace = "com.pedropathing.callbacks"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(30)
     }
 
     defaultConfig {
@@ -35,11 +34,28 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            artifactId = "callback-runner-ivy"
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
 }
 
 dependencies {
     compileOnly(project(":"))
     compileOnly("org.firstinspires.ftc:RobotCore:12.0.0")
     compileOnly("org.firstinspires.ftc:FtcCommon:12.0.0")
-    implementation("com.pedropathing.ivy:core:1.1.1")
+    api("com.pedropathing.ivy:core:1.1.1")
 }

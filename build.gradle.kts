@@ -1,5 +1,3 @@
-import org.gradle.api.internal.artifacts.dependencies.DefaultImmutableVersionConstraint.strictly
-
 plugins {
     kotlin("jvm") version "2.4.20"
     id("com.android.library") version "9.0.1" apply false
@@ -7,7 +5,7 @@ plugins {
 }
 
 group = "com.pedropathing"
-version = "2.0.1"
+version = "2.1.0"
 
 allprojects.forEach {
     it.repositories {
