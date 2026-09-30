@@ -3,13 +3,6 @@ plugins {
     `maven-publish`
 }
 
-version = project(":").version
-group = project(":").group
-
-repositories {
-    mavenCentral()
-}
-
 kotlin {
     compilerOptions {
         optIn.add("com.pedropathing.callbacks.InternalCallbacksApi")

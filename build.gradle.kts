@@ -1,14 +1,25 @@
+import org.gradle.api.internal.artifacts.dependencies.DefaultImmutableVersionConstraint.strictly
+
 plugins {
     kotlin("jvm") version "2.4.20"
+    id("com.android.library") version "9.0.1" apply false
     `maven-publish`
 }
 
 group = "com.pedropathing"
 version = "2.0.1"
 
-repositories {
-    mavenCentral()
-    maven("https://repo.dairy.foundation/releases/")
+allprojects.forEach {
+    it.repositories {
+        mavenCentral()
+        google()
+        maven("https://repo.dairy.foundation/releases/")
+    }
+}
+
+subprojects.forEach {
+    it.version = rootProject.version
+    it.group = rootProject.group
 }
 
 kotlin {
